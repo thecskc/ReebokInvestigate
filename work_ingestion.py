@@ -1,14 +1,16 @@
-import requests
+
 import glob
 import asyncio
-import re
-import ujson
 import uuid
-
 import aiomysql
 from aiomysql import DictCursor
-from datetime import datetime,date
+from datetime import date
 import csv
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+
 
 
 loop = asyncio.get_event_loop()
@@ -23,6 +25,7 @@ class IngestionTime:
         self.first_file = first_file
         self.files_list = glob.glob("./files/*.csv")
         self.url_dates_dict = None
+        self.batch_csv_file_name = None
 
     def convert_string_to_date(self,date_str):
         year = date_str[0:4]
@@ -147,7 +150,7 @@ class IngestionTime:
         return return_url_dates_dict
 
 
-    def append_database_dates(self,limit=None,filename="batch7.csv"):
+    def append_database_dates(self,filename="batch7.csv"):
 
         num_not_in_db = 0
         net_difference = 0
@@ -197,6 +200,8 @@ class IngestionTime:
                     print((diff))
                     net_difference += diff
                     writer_obj.writerow([key,diff])
+                    self.batch_csv_file_name = filename
+
 
         if(num_present!=0):
             return net_difference/num_present
@@ -204,85 +209,68 @@ class IngestionTime:
             return -1
 
 
+    def analyze(self,outfile_name="batch7_report.csv",image_name="batch7.png"):
+
+        file = pd.read_csv(self.batch_csv_file_name)
+        num_dict = {}
+        file.columns = ["url", "difference"]
+        file.head()
+        for diff in file["difference"]:
+            if (num_dict.get(diff, None) == None):
+                num_dict[diff] = 1
+            else:
+                num_dict[diff] += 1
+
+        table = pd.Series(data=num_dict)
+        table.name = "Number of days from obtaining feed file vs Number of items uploaded in database"
+        table.to_csv(path=outfile_name)
+        for key in num_dict.keys():
+            if (key < 0):
+                num_dict[0] += num_dict.get(key)
+
+        less_than_zero = list()
+        for key in num_dict.keys():
+            if (key < 0):
+                less_than_zero.append(key)
+        for less in less_than_zero:
+            num_dict.pop(less)
+
+        number_at_zero = num_dict.get(0)
+        print("Number of files ingested at the time of obtaining feed - ",
+              number_at_zero)
+
+        print(num_dict)
+        num_dict_keys_x = num_dict.keys()
+        num_dict_values_y = num_dict.values()
+
+        sorted_y_values = sorted(num_dict_values_y)
+
+        height_limit = (sorted_y_values[len(sorted_y_values) - 2]) + 5
+        max_value = sorted_y_values[len(sorted_y_values) - 1]
+
+        above_limits_dict = dict()
+        for key in num_dict.keys():
+            if (num_dict.get(key) > height_limit):
+                above_limits_dict[key] = num_dict.get(key)
+                num_dict[key] = height_limit
+
+        num_dict_keys_x = num_dict.keys()
+        num_dict_values_y = num_dict.values()
+
+        plt.bar(num_dict_keys_x, num_dict_values_y)
+
+        plt.xlabel("Days from obtaining feed file")
+        plt.ylabel("Number of items in database")
+
+        plt.savefig(image_name, dpi=100)
+        plt.show()
+
+    def append_and_analyze(self):
+        self.append_database_dates()
+        self.analyze()
 
 
 
-
-        # database_dates_dict = dict()
-        #
-        #
-        # for values in value:
-        #     for key in values.keys():
-        #         database_dates_dict[key] = values.get(key)
-        #
-        # print(database_dates_dict)
-
-
-        # if(limit is None):
-        #     count=0
-        #     for urls in url_dates_dict.keys():
-        #         count += 1
-        #         ret_value = loop.run_until_complete(self.fetch(urls))
-        #         print(count,urls,ret_value)
-        #         list_values = url_dates_dict.get(urls)
-        #
-        #         list_values.append(ret_value)
-        #         url_dates_dict[urls] = list_values
-        # else:
-        #     count = 0
-        #
-        #     for urls in url_dates_dict.keys():
-        #         count+=1
-        #         if(count<=limit):
-        #             ret_value = loop.run_until_complete(self.fetch(urls))
-        #             list_values = url_dates_dict.get(urls)
-        #             list_values.append(ret_value)
-        #             url_dates_dict[urls] = list_values
-        #         else:
-        #             break
-        #
-        # return url_dates_dict
-
-
-
-    def compute_and_refine_dict(self,limit=None):
-
-        num_not_present = 0
-        num_legitimate = 0
-        net_difference = 0
-        average_difference = 0
-        url_dates_dict = self.append_database_dates(limit)
-        print(url_dates_dict)
-        keys_to_delete = list()
-
-
-        for keys in url_dates_dict.keys():
-            list_value = url_dates_dict.get(keys)
-            print(list_value)
-            if(len(list_value)==2 and list_value[1]=="None"):
-                num_not_present+=1
-                keys_to_delete.append(keys)
-
-        for delete_key in keys_to_delete:
-            url_dates_dict.pop(delete_key)
-
-        print(url_dates_dict)
-
-        for key in url_dates_dict.keys():
-            num_legitimate += 1
-            list_value = url_dates_dict.get(key)
-            date_one = list_value[0]
-            date_two = list_value[1]
-            net_difference += abs(int(date_one)-int(date_two))
-
-        if(num_legitimate!=0):
-            average_difference = net_difference/num_legitimate
-
-        if(num_legitimate!=0):
-
-            return num_not_present,-1
-        else:
-            return num_not_present,average_difference
 
 
     def print_list_of_files(self):
@@ -302,38 +290,13 @@ class IngestionTime:
 
 
 
+if __name__=="__main__":
+    ingester = IngestionTime()
+    ret_value = ingester.append_database_dates()
+    print(ret_value)
 
-ingester = IngestionTime()
-ret_value = ingester.append_database_dates()
-print(ret_value)
 
 
-
-# tuple_val = ingester.compute_and_refine_dict()
-# print(tuple_val[0])
-# print(tuple_val[1])
-
-# ingester = IngestionTime()
-#
-#
-#
-#
-# #print(ingester.compute_and_refine_dict()[1])
-#
-#
-#
-#
-# return_val = loop.run_until_complete\
-#     (ingester.
-#      fetch
-#      ("http://www.anrdoezrs.net/click-7654620-11945161-1432894004053?"
-#       "url=http%3A%2F%2Fwww.mangooutlet.com%2Fredirect.faces%3Fop%3Dconta%26"
-#       "idioma%3DUS%26pais%3D400%26producto%3D31077547%26color%3D02&"
-#       "cjsku=310775474850"))
-# print(type(return_val))
-# return_val = (return_val.strftime('%y%m%d'))
-# return_val = "20" + return_val
-# print(return_val)
 
 
 
