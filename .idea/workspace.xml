@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="73633c97-ff56-471d-8866-a1bdafda7340" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/work_ingestion.py" afterPath="$PROJECT_DIR$/work_ingestion.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -21,11 +20,11 @@
       <file leaf-file-name="work_ingestion.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/work_ingestion.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="646">
-              <caret line="286" column="0" lean-forward="true" selection-start-line="286" selection-start-column="0" selection-end-line="286" selection-end-column="0" />
+            <state relative-caret-position="475">
+              <caret line="168" column="0" lean-forward="true" selection-start-line="168" selection-start-column="0" selection-end-line="168" selection-end-column="0" />
               <folding>
-                <element signature="e#1#12#0" expanded="true" />
-                <marker date="1500998788000" expanded="true" signature="1485:1544" ph="SELECT item_... items" />
+                <element signature="e#0#11#0" expanded="true" />
+                <marker date="1500998964000" expanded="true" signature="1479:1538" ph="SELECT item_... items" />
               </folding>
             </state>
           </provider>
@@ -327,11 +326,11 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/work_ingestion.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="646">
-          <caret line="286" column="0" lean-forward="true" selection-start-line="286" selection-start-column="0" selection-end-line="286" selection-end-column="0" />
+        <state relative-caret-position="475">
+          <caret line="168" column="0" lean-forward="true" selection-start-line="168" selection-start-column="0" selection-end-line="168" selection-end-column="0" />
           <folding>
-            <element signature="e#1#12#0" expanded="true" />
-            <marker date="1500998788000" expanded="true" signature="1485:1544" ph="SELECT item_... items" />
+            <element signature="e#0#11#0" expanded="true" />
+            <marker date="1500998964000" expanded="true" signature="1479:1538" ph="SELECT item_... items" />
           </folding>
         </state>
       </provider>

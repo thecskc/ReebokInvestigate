@@ -1,4 +1,3 @@
-
 import glob
 import asyncio
 import uuid
@@ -9,12 +8,7 @@ import csv
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
-
-
-
 loop = asyncio.get_event_loop()
-
 DATA = uuid.UUID('72a6f085-d4bf-4390-8345-5050860a7f2b')
 BY_UNI = uuid.UUID('d9923e18-bd16-4ac9-895b-a9287932e1d9')
 
