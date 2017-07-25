@@ -243,8 +243,9 @@ class IngestionTime:
         plt.show()
 
     def append_and_analyze(self):
-        self.append_database_dates()
+        ret_value = self.append_database_dates()
         self.analyze()
+        return ret_value
 
     def print_list_of_files(self):
 
@@ -262,5 +263,5 @@ class IngestionTime:
 
 if __name__ == "__main__":
     ingester = IngestionTime()
-    ret_value = ingester.append_database_dates()
+    ret_value = ingester.append_and_analyze()
     print(ret_value)
